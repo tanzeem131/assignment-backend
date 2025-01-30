@@ -44,7 +44,6 @@ app.get("/get-techpackCatalogue", async (req, res) => {
   }
 });
 
-// Utility function to convert string to mongoose data type
 const getMongooseType = (type) => {
   const types = {
     string: String,
@@ -54,10 +53,9 @@ const getMongooseType = (type) => {
     array: Array,
     object: Object,
   };
-  return types[type.toLowerCase()] || String; // Default to String if type is unknown
+  return types[type.toLowerCase()] || String;
 };
 
-// API to dynamically add a new column
 app.post("/add-column", async (req, res) => {
   try {
     const { columnName, dataType } = req.body;
@@ -68,21 +66,17 @@ app.post("/add-column", async (req, res) => {
         .json({ message: "Column name and data type are required." });
     }
 
-    // Validate column name
     if (typeof columnName !== "string" || columnName.trim() === "") {
       return res.status(400).json({ message: "Invalid column name." });
     }
 
-    // Convert string to Mongoose data type
     const mongooseType = getMongooseType(dataType);
 
-    // Add new field dynamically
     const updatedSchema = new mongoose.Schema({
       ...bomItem.schema.obj,
       [`dynamicFields.${columnName}`]: { type: mongooseType },
     });
 
-    // Update the model
     mongoose.models.BOMItem = mongoose.model("BOMItem", updatedSchema);
 
     res
