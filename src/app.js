@@ -1,13 +1,9 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const { connectDB } = require("./config/database");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
-let { PORT } = process.env;
-
-const bomItem = require("./models/bom");
-const techpackCatalogue = require("./models/techpackCatalogue");
+const { PORT } = process.env;
 
 app.use(
   cors({
@@ -18,115 +14,12 @@ app.use(
 
 app.use(express.json());
 
-app.post("/add-techpackCatalogue", async (req, res) => {
-  try {
-    const { image, name } = req.body;
-    const newtechpackCatalogue = new techpackCatalogue({
-      image,
-      name,
-    });
-    await newtechpackCatalogue.save();
-    res
-      .status(201)
-      .json({ message: "Item added successfully", item: newtechpackCatalogue });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
-app.get("/get-techpackCatalogue", async (req, res) => {
-  try {
-    const items = await techpackCatalogue.find();
-    res.status(200).json({ message: "Items retrieved successfully", items });
-  } catch (error) {
-    console.error("Error in /get-bom:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
-const getMongooseType = (type) => {
-  const types = {
-    string: String,
-    number: Number,
-    boolean: Boolean,
-    date: Date,
-    array: Array,
-    object: Object,
-  };
-  return types[type.toLowerCase()] || String;
-};
-
-app.post("/add-column", async (req, res) => {
-  try {
-    const { columnName, dataType } = req.body;
-
-    if (!columnName || !dataType) {
-      return res
-        .status(400)
-        .json({ message: "Column name and data type are required." });
-    }
-
-    if (typeof columnName !== "string" || columnName.trim() === "") {
-      return res.status(400).json({ message: "Invalid column name." });
-    }
-
-    const mongooseType = getMongooseType(dataType);
-
-    const updatedSchema = new mongoose.Schema({
-      ...bomItem.schema.obj,
-      [`dynamicFields.${columnName}`]: { type: mongooseType },
-    });
-
-    mongoose.models.BOMItem = mongoose.model("BOMItem", updatedSchema);
-
-    res
-      .status(200)
-      .json({ message: `Column '${columnName}' added successfully.` });
-  } catch (error) {
-    console.error("Error adding column:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
-app.post("/add-bom", async (req, res) => {
-  try {
-    // const {
-    //   image,
-    //   item,
-    //   description,
-    //   quantity,
-    //   quality,
-    //   colorCode,
-    //   supplier,
-    //   ...dynamicFields
-    // } = req.body;
-    // const newItem = new bomItem({
-    //   image,
-    //   item,
-    //   description,
-    //   quantity,
-    //   quality,
-    //   colorCode,
-    //   supplier,
-    //   ...dynamicFields,
-    // });
-    const newItem = new bomItem(req.body);
-    await newItem.save();
-    res.status(201).json({ message: "Item added successfully", item: newItem });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
-app.get("/get-bom", async (req, res) => {
-  try {
-    const items = await bomItem.find();
-    res.status(200).json({ message: "Items retrieved successfully", items });
-  } catch (error) {
-    console.error("Error in /get-bom:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
+const coverSheetRoutes = require("./router/addcoversheet");
+app.use("/", coverSheetRoutes);
+const techpackCatalogueRoutes = require("./router/techpackcatalogue");
+app.use("/", techpackCatalogueRoutes);
+const bomDataRoutes = require("./router/bomdata");
+app.use("/", bomDataRoutes);
 
 connectDB()
   .then(() => {
