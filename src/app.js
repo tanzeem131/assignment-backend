@@ -7,7 +7,10 @@ const { PORT } = process.env;
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://papaya-fudge-dc5dcd.netlify.app",
+    ],
     withcredentials: true,
   })
 );
