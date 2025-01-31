@@ -5,20 +5,13 @@ const cors = require("cors");
 require("dotenv").config();
 const { PORT } = process.env;
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+app.use(cors());
 
 app.use(express.json());
 
-const coverSheetRoutes = require("./router/addcoversheet");
-app.use("/", coverSheetRoutes);
 const techpackCatalogueRoutes = require("./router/techpackcatalogue");
-app.use("/", techpackCatalogueRoutes);
 const bomDataRoutes = require("./router/bomdata");
+app.use("/", techpackCatalogueRoutes);
 app.use("/", bomDataRoutes);
 
 connectDB()
