@@ -5,26 +5,6 @@ const bomItem = require("../models/bom");
 
 router.post("/add-bom", async (req, res) => {
   try {
-    // const {
-    //   image,
-    //   item,
-    //   description,
-    //   quantity,
-    //   quality,
-    //   colorCode,
-    //   supplier,
-    //   ...dynamicFields
-    // } = req.body;
-    // const newItem = new bomItem({
-    //   image,
-    //   item,
-    //   description,
-    //   quantity,
-    //   quality,
-    //   colorCode,
-    //   supplier,
-    //   ...dynamicFields,
-    // });
     const newItem = new bomItem(req.body);
     await newItem.save();
     res.status(201).json({ message: "Item added successfully", item: newItem });
