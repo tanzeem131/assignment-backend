@@ -1,11 +1,16 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const techpackCatalogueSchema = new mongoose.Schema(
   {
     image: {
       type: String,
-      minlength: 2,
       maxlength: 500,
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL:");
+        }
+      },
     },
     name: {
       type: String,

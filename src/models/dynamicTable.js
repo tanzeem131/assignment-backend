@@ -1,11 +1,16 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
-const bomSchema = new mongoose.Schema(
+const dynamicTableSchema = new mongoose.Schema(
   {
     image: {
       type: String,
-      minlength: 2,
       maxlength: 500,
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL:");
+        }
+      },
     },
     item: {
       type: String,
@@ -37,12 +42,11 @@ const bomSchema = new mongoose.Schema(
       minlength: 2,
       maxlength: 30,
     },
-    dynamicFields: { type: Object, default: {} },
+    dynamicFields: { type: Map, of: mongoose.Schema.Types.Mixed },
   },
-  {
-    timestamps: true,
-  },
-  { strict: false }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("Bom", bomSchema);
+const DynamicTable = mongoose.model("DynamicTable", dynamicTableSchema);
+
+module.exports = DynamicTable;

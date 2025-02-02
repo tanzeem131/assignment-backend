@@ -18,9 +18,9 @@ app.use(
 app.use(express.json());
 
 const techpackCatalogueRoutes = require("./router/techpackcatalogue");
-const bomDataRoutes = require("./router/bomdata");
+const dynamicTableRoutes = require("./router/dynamicTable");
 app.use("/", techpackCatalogueRoutes);
-app.use("/", bomDataRoutes);
+app.use("/", dynamicTableRoutes);
 
 connectDB()
   .then(() => {
